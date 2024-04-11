@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Gantt Chart Generator</title>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f3f3;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    h4 {
+      text-align: center;
+      color: #424242;
+    }
+    form {
+      max-width: 400px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+
+    h2 {
+      margin-top: 20px;
+      color: #333;
+    }
+
+    #ganttChart {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: auto;
+      width: 100%;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    .gantt-bars {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      margin-top: 10px;
+      height: 40px;
+      background-color: #f2f2f2;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .gantt-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      background-color: #4caf50;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .error {
+      color: red;
+    }
+
+    /* Media Queries for Mobile Devices */
+
+    @media screen and (max-width: 768px) {
+      form {
+        max-width: 100%;
+      }
+
+      table {
+        font-size: 14px;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      h1 {
+        font-size: 24px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      p {
+        font-size: 16px;
+      }
+
+      form {
+        padding: 10px;
+      }
+
+      input[type="number"],
+      input[type="text"],
+      select {
+        padding: 8px;
+        font-size: 14px;
+      }
+
+      button {
+        padding: 8px;
+        font-size: 14px;
+      }
+    }
+
+    /* Custom Styles for Buttons */
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: Arial, sans-serif;
+      padding-bottom: 10px;
+    }
+
+    .button-container {
+      margin-bottom: 10px;
+    }
+
+    .button-container a {
+      display: inline-block;
+      margin: 5px;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      background-color: #0366d6; /* GitHub blue */
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .button-container a:hover {
+      background-color: #054aa0; /* Darker blue on hover */
+    }
+
+    .whatsapp-button {
+      display: block;
+      width: fit-content;
+      padding: 10px;
+      background-color: #4caf50;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      text-transform: uppercase;
+      float: left;
+      margin-bottom: 30px;
+    }
+  </style>
+  <body>
+    <h1>Gantt Chart Generator</h1>
+
+    <h2>Gantt Chart: Input</h2>
+    <label for="processes">Number of Processes:</label>
+    <input type="number" id="processes" name="processes" />
+
+    <br /><br />
+
+    <label for="arrivalTimes">Arrival Times (comma-separated):</label>
+    <input type="text" id="arrivalTimes" name="arrivalTimes" />
+
+    <br /><br />
+
+    <label for="burstTimes">Burst Times (comma-separated):</label>
+    <input type="text" id="burstTimes" name="burstTimes" />
+
+    <br /><br />
+
+    <label for="algorithm">Scheduling Algorithm:</label>
+    <select id="algorithm" name="algorithm" onchange="showAdditionalFields()">
+      <option value="FCFS">First Come First Serve (FCFS)</option>
+      <option value="SJF">Shortest Job First</option>
+      <option value="LJF">Longest Job First</option>
+      <option value="SRTF">Shortest Remaining Time Left</option>
+      <option value="LRTF">Longest Remaining Time Left</option>
+      <!-- Add other scheduling algorithms here -->
+    </select>
+
+    <br /><br />
+
+    <!-- Input field for time quantum -->
+    <div id="timeQuantumInput" style="display: none">
+      <label for="timeQuantum">Time Quantum:</label>
+      <input type="number" id="timeQuantumInput" name="timeQuantum" />
+    </div>
+
+    <!-- Input field for priority -->
+    <div id="priorityValues" style="display: none">
+      <label for="priority">Priority:</label>
+      <input type="number" id="priorityValues" name="priority" />
+    </div>
+
+    <br /><br />
+    <script>
+      function showAdditionalFields() {
+        var algorithm = document.getElementById("algorithm").value;
+        var timeQuantumInput = document.getElementById("timeQuantumInput");
+        var priorityValues = document.getElementById("priorityValues");
+
+        // Hide all additional input fields
+        timeQuantumInput.style.display = "none";
+        priorityValues.style.display = "none";
+
+        // Show additional input fields based on the selected algorithm
+        if (algorithm === "RR") {
+          timeQuantumInput.style.display = "block";
+        } else if (algorithm === "Priority") {
+          priorityValues.style.display = "block";
+        }
+      }
+    </script>
+
+    <button onclick="generateGanttChart()">Generate Gantt Chart</button>
+
+    <h2>Gantt Chart: Output</h2>
+    <div id="ganttChart"></div>
+
+    <div id="errorMessages"></div>
+  </body>
+ 
+</html>
